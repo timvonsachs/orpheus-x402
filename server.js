@@ -55,8 +55,9 @@ app.get('/pricing', (req, res) => {
   });
 });
 
-app.listen(8402, () => {
-  console.log('Orpheus x402 Service live on port 8402');
+const PORT = process.env.PORT || 8402;
+app.listen(PORT, () => {
+  console.log(`Orpheus x402 Service live on port ${PORT}`);
   console.log('Wallet: ' + WALLET);
   console.log('Price: $' + PRICE + ' USDC per analysis');
 });

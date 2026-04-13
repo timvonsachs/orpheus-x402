@@ -7,7 +7,9 @@ const FormData = require('form-data');
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// x402 Payment Config
+const ORPHEUS_BACKEND = process.env.ORPHEUS_BACKEND_URL || 'http://localhost:8001';
+
+
 const PRICE = '0.10';  // USDC
 const WALLET = '0x3A48748098B08d0BdD8dd794A9F2D8F34DD888A1';
 const FACILITATOR = 'https://facilitator.openx402.ai';
@@ -27,9 +29,9 @@ app.post('/v1/sense',
   async (req, res) => {
     // Forward to Orpheus
     const form = new FormData();
-    form.append('audio', req.file.buffer, req.file.originalname);
+    form.append('file', req.file.buffer, req.file.originalname);
     
-    const orpheusResponse = await fetch('http://localhost:8001/v1/sense', {
+    const orpheusResponse = await fetch(`${ORPHEUS_BACKEND}/v1/sense`, {
       method: 'POST',
       body: form
     });

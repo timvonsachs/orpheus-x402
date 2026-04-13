@@ -1,0 +1,148 @@
+{
+  "rows": [
+    {
+      "sample": "tada_01.wav",
+      "label": "tada",
+      "score": 3.0,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_06.wav",
+      "label": "tada",
+      "score": 0.5,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_07.wav",
+      "label": "tada",
+      "score": 2.3,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_08.wav",
+      "label": "tada",
+      "score": 3.0,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_09.wav",
+      "label": "tada",
+      "score": 1.3,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_10.wav",
+      "label": "tada",
+      "score": 0.2,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_blog_01.wav",
+      "label": "tada",
+      "score": 11.6,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_blog_02.wav",
+      "label": "tada",
+      "score": 2.6,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_blog_03.wav",
+      "label": "tada",
+      "score": 11.2,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "tada_blog_04.wav",
+      "label": "tada",
+      "score": 1.5,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "human_01.wav",
+      "label": "human",
+      "score": 51.5,
+      "prediction": "human"
+    },
+    {
+      "sample": "human_02.wav",
+      "label": "human",
+      "score": 70.1,
+      "prediction": "human"
+    },
+    {
+      "sample": "human_03.wav",
+      "label": "human",
+      "score": 50.9,
+      "prediction": "human"
+    },
+    {
+      "sample": "human_04.wav",
+      "label": "human",
+      "score": 51.3,
+      "prediction": "human"
+    },
+    {
+      "sample": "human_05.wav",
+      "label": "human",
+      "score": 38.1,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "human_06.wav",
+      "label": "human",
+      "score": 41.2,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "human_07.wav",
+      "label": "human",
+      "score": 56.1,
+      "prediction": "human"
+    },
+    {
+      "sample": "human_08.wav",
+      "label": "human",
+      "score": 20.9,
+      "prediction": "synthetic"
+    },
+    {
+      "sample": "human_09.wav",
+      "label": "human",
+      "score": 80.2,
+      "prediction": "human"
+    },
+    {
+      "sample": "human_10.wav",
+      "label": "human",
+      "score": 59.6,
+      "prediction": "human"
+    }
+  ],
+  "tada_mean": 3.72,
+  "human_mean": 51.989999999999995,
+  "auc": 1.0,
+  "accuracy": 0.85,
+  "confusion": [
+    [
+      10,
+      0
+    ],
+    [
+      3,
+      7
+    ]
+  ],
+  "tada_synth_detected": 10,
+  "human_human_detected": 7,
+  "conclusion": "Orpheus erkennt TADA zuverlaessig. Ohr 2 funktioniert gegen State-of-the-Art.",
+  "human_source": "preexisting",
+  "tada_generation_mode": "blog_demo_fallback",
+  "engine_mode": "melcnn",
+  "generation_errors": [
+    "local_generation_failed: Could not load model HumeAI/tada-1b with any of the following classes: (<class 'transformers.models.auto.modeling_auto.AutoModelForTextToWaveform'>, <class 'transformers.models.auto.modeling_auto.AutoModelForTextToSpectrogram'>). See the original errors:\n\nwhile loading with AutoModelForTextToWaveform, an error is thrown:\nTraceback (most recent call last):\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/pipelines/base.py\", line 293, in infer_framework_load_model\n    model = model_class.from_pretrained(model, **kwargs)\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py\", line 607, in from_pretrained\n    raise ValueError(\nValueError: Unrecognized configuration class <class 'transformers.models.llama.configuration_llama.LlamaConfig'> for this kind of AutoModel: AutoModelForTextToWaveform.\nModel type should be one of BarkConfig, CsmConfig, FastSpeech2ConformerConfig, FastSpeech2ConformerWithHifiGanConfig, MusicgenConfig, MusicgenMelodyConfig, Qwen2_5OmniConfig, Qwen3OmniMoeConfig, SeamlessM4TConfig, SeamlessM4Tv2Config, VitsConfig.\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/pipelines/base.py\", line 311, in infer_framework_load_model\n    model = model_class.from_pretrained(model, **fp32_kwargs)\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py\", line 607, in from_pretrained\n    raise ValueError(\nValueError: Unrecognized configuration class <class 'transformers.models.llama.configuration_llama.LlamaConfig'> for this kind of AutoModel: AutoModelForTextToWaveform.\nModel type should be one of BarkConfig, CsmConfig, FastSpeech2ConformerConfig, FastSpeech2ConformerWithHifiGanConfig, MusicgenConfig, MusicgenMelodyConfig, Qwen2_5OmniConfig, Qwen3OmniMoeConfig, SeamlessM4TConfig, SeamlessM4Tv2Config, VitsConfig.\n\nwhile loading with AutoModelForTextToSpectrogram, an error is thrown:\nTraceback (most recent call last):\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/pipelines/base.py\", line 293, in infer_framework_load_model\n    model = model_class.from_pretrained(model, **kwargs)\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py\", line 607, in from_pretrained\n    raise ValueError(\nValueError: Unrecognized configuration class <class 'transformers.models.llama.configuration_llama.LlamaConfig'> for this kind of AutoModel: AutoModelForTextToSpectrogram.\nModel type should be one of FastSpeech2ConformerConfig, SpeechT5Config.\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/pipelines/base.py\", line 311, in infer_framework_load_model\n    model = model_class.from_pretrained(model, **fp32_kwargs)\n  File \"/Users/elpatron/orpheus-acoustic-sense/.venv/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py\", line 607, in from_pretrained\n    raise ValueError(\nValueError: Unrecognized configuration class <class 'transformers.models.llama.configuration_llama.LlamaConfig'> for this kind of AutoModel: AutoModelForTextToSpectrogram.\nModel type should be one of FastSpeech2ConformerConfig, SpeechT5Config.\n\n\n",
+    "inference_generation_failed: "
+  ]
+}

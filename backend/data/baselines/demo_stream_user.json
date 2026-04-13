@@ -1,0 +1,37 @@
+{
+  "speaker_id": "demo_stream_user",
+  "alpha": 0.3,
+  "warmup_segments": 5,
+  "features": {
+    "stress": {
+      "ewma": 0.1403976585665008,
+      "variance": 0.013866459042025278,
+      "count": 1143
+    },
+    "engagement": {
+      "ewma": 0.2539236263279721,
+      "variance": 0.015942888346246336,
+      "count": 1143
+    },
+    "f0_mean": {
+      "ewma": 0.0,
+      "variance": 0.0,
+      "count": 1143
+    },
+    "jitter": {
+      "ewma": 0.0,
+      "variance": 0.0,
+      "count": 1143
+    },
+    "speech_rate": {
+      "ewma": 4.078289027400641,
+      "variance": 0.7090499763433405,
+      "count": 1143
+    },
+    "pause_rate": {
+      "ewma": 36.0269906932516,
+      "variance": 43.166672055138676,
+      "count": 1143
+    }
+  }
+}

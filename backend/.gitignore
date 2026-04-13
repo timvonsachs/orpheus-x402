@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+.hf_cache/
+*.log
+.DS_Store
+data/real_calls/
+reports/*.png
+reports/*.html
+data/benchmarks/*.zip
+data/benchmarks/**/*.zip

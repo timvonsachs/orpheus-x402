@@ -8,58 +8,304 @@ const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
 const ORPHEUS_BACKEND = process.env.ORPHEUS_BACKEND_URL || 'http://localhost:8001';
+const WALLET          = process.env.WALLET_ADDRESS || '0x3A48748098B08d0BdD8dd794A9F2D8F34DD888A1';
 
+// ── Facilitator ───────────────────────────────────────────────────────────────
+// CDP facilitator (mainnet + free tier 1,000 tx/month)
+// Fallback: openx402.ai (no auth required)
+const FACILITATOR_URL = process.env.CDP_FACILITATOR_URL || 'https://api.cdp.coinbase.com/platform/v2/x402';
 
-const PRICE = '0.10';  // USDC
-const WALLET = '0x3A48748098B08d0BdD8dd794A9F2D8F34DD888A1';
-const FACILITATOR = 'https://facilitator.openx402.ai';
+const facilitatorConfig = { url: FACILITATOR_URL };
 
-// x402 Payment Middleware (global, vor den Routes registrieren)
+// CDP API keys for mainnet (optional — falls back to openx402.ai without them)
+if (process.env.CDP_API_KEY_ID && process.env.CDP_API_KEY_SECRET) {
+  facilitatorConfig.cdpApiKeyId     = process.env.CDP_API_KEY_ID;
+  facilitatorConfig.cdpApiKeySecret = process.env.CDP_API_KEY_SECRET;
+}
+
+// ── Biomarker output schema (for Bazaar discovery) ────────────────────────────
+const BIOMARKER_OUTPUT_SCHEMA = {
+  type: 'object',
+  properties: {
+    humanness: {
+      type: 'object',
+      properties: {
+        score:          { type: 'number', description: 'Humanness score 0-100' },
+        classification: { type: 'string', description: 'human|ai|uncertain' }
+      }
+    },
+    paralinguistic: {
+      type: 'object',
+      properties: {
+        summary: {
+          type: 'object',
+          properties: {
+            engagement:        { type: 'number', description: 'Listener engagement 0-1' },
+            stress_level:      { type: 'number', description: 'Stress level 0-1' },
+            confidence_level:  { type: 'number', description: 'Confidence 0-1' },
+            valence_estimate:  { type: 'string', description: 'positive|negative|neutral' },
+            ml_emotion: {
+              type: 'object',
+              properties: {
+                prediction:  { type: 'string' },
+                probability: { type: 'number' }
+              }
+            }
+          }
+        },
+        voice_profile: {
+          type: 'object',
+          properties: {
+            authority:   { type: 'number', description: 'Authority score 0-100' },
+            authenticity:{ type: 'number', description: 'Authenticity score 0-100' }
+          }
+        }
+      }
+    },
+    environment: {
+      type: 'object',
+      properties: {
+        environment: { type: 'string', description: 'indoor|outdoor|vehicle|studio' },
+        noise_level: { type: 'string', description: 'low|medium|high' }
+      }
+    },
+    audio_duration_seconds: { type: 'number' },
+    processing_time_ms:     { type: 'number' }
+  }
+};
+
+const BIOMARKER_OUTPUT_EXAMPLE = {
+  humanness: { score: 87.3, classification: 'human' },
+  paralinguistic: {
+    summary: {
+      engagement: 0.74,
+      stress_level: 0.32,
+      confidence_level: 0.81,
+      valence_estimate: 'positive',
+      ml_emotion: { prediction: 'neutral', probability: 0.62 }
+    },
+    voice_profile: { authority: 65.2, authenticity: 78.9 }
+  },
+  environment: { environment: 'indoor', noise_level: 'low' },
+  audio_duration_seconds: 8.4,
+  processing_time_ms: 312
+};
+
+// ── x402 Payment Middleware ───────────────────────────────────────────────────
 app.use(paymentMiddleware(
   WALLET,
   {
-    'POST /v1/sense': { price: `$${PRICE}`, network: 'base' }
+    // Full Spectrum — 88 biomarkers
+    'POST /v1/sense': {
+      price: '$0.10',
+      network: 'base',
+      config: {
+        description: 'Orpheus Voice Intelligence API — 88 acoustic biomarkers from any audio file. Analyzes humanness, engagement, authority, stress, emotion, confidence, and environment. Built for sales call optimization, voice authentication, and mental health monitoring. $0.10 per analysis. No API key required.',
+        mimeType: 'application/json',
+        discoverable: true,
+        outputSchema: BIOMARKER_OUTPUT_SCHEMA,
+        inputSchema: {
+          contentType: 'multipart/form-data',
+          properties: {
+            file: {
+              type: 'string',
+              format: 'binary',
+              description: 'Audio file (WAV, MP3, M4A, OGG, FLAC) — any sample rate, mono or stereo'
+            }
+          },
+          required: ['file']
+        }
+      }
+    },
+
+    // Authority Stream — 12 biomarkers
+    'POST /v1/sense/authority': {
+      price: '$0.03',
+      network: 'base',
+      config: {
+        description: 'Orpheus Authority Stream — 12 authority and confidence biomarkers: authority score, confidence level, assertiveness, dominance indicators. Optimized for leadership assessment and sales coaching.',
+        mimeType: 'application/json',
+        discoverable: true,
+        outputSchema: {
+          type: 'object',
+          properties: {
+            authority:    { type: 'number', description: 'Authority score 0-100' },
+            confidence:   { type: 'number', description: 'Confidence level 0-1' },
+            assertiveness:{ type: 'number', description: 'Assertiveness score 0-1' }
+          }
+        }
+      }
+    },
+
+    // Emotion Stream — 15 biomarkers
+    'POST /v1/sense/emotion': {
+      price: '$0.03',
+      network: 'base',
+      config: {
+        description: 'Orpheus Emotion Stream — 15 emotional biomarkers: valence, arousal, emotion prediction, stress level, engagement. Optimized for customer service quality and mental health monitoring.',
+        mimeType: 'application/json',
+        discoverable: true,
+        outputSchema: {
+          type: 'object',
+          properties: {
+            valence:    { type: 'string', description: 'positive|negative|neutral' },
+            arousal:    { type: 'number', description: 'Arousal level 0-1' },
+            emotion:    { type: 'string', description: 'Predicted emotion label' },
+            stress:     { type: 'number', description: 'Stress level 0-1' },
+            engagement: { type: 'number', description: 'Engagement level 0-1' }
+          }
+        }
+      }
+    },
+
+    // Health Stream — 18 biomarkers
+    'POST /v1/sense/health': {
+      price: '$0.05',
+      network: 'base',
+      config: {
+        description: 'Orpheus Health Stream — 18 voice health biomarkers: vocal fatigue, tremor indicators, breathiness, laryngeal tension. Optimized for wellness monitoring and clinical research.',
+        mimeType: 'application/json',
+        discoverable: true,
+        outputSchema: {
+          type: 'object',
+          properties: {
+            vocal_fatigue: { type: 'number', description: 'Vocal fatigue score 0-1' },
+            breathiness:   { type: 'number', description: 'Breathiness level 0-1' },
+            tremor:        { type: 'number', description: 'Tremor index 0-1' }
+          }
+        }
+      }
+    },
+
+    // Authenticity Stream — 10 biomarkers
+    'POST /v1/sense/authenticity': {
+      price: '$0.04',
+      network: 'base',
+      config: {
+        description: 'Orpheus Authenticity Stream — 10 authenticity and humanness biomarkers: humanness score, deception indicators, spontaneity markers. Optimized for fraud detection and deepfake identification.',
+        mimeType: 'application/json',
+        discoverable: true,
+        outputSchema: {
+          type: 'object',
+          properties: {
+            humanness_score:   { type: 'number', description: 'Humanness 0-100 (100=definitely human)' },
+            classification:    { type: 'string', description: 'human|ai|uncertain' },
+            authenticity_score:{ type: 'number', description: 'Authenticity 0-100' }
+          }
+        }
+      }
+    }
   },
-  { url: FACILITATOR }
+  facilitatorConfig
 ));
 
-// x402 Middleware auf /v1/sense
-app.post('/v1/sense', 
-  upload.single('audio'),
-  async (req, res) => {
-    // Forward to Orpheus
+// ── Route Handlers ────────────────────────────────────────────────────────────
+
+// Full Spectrum — proxy to Python backend
+app.post('/v1/sense', upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No audio file provided' });
+
     const form = new FormData();
-    form.append('file', req.file.buffer, req.file.originalname);
-    
+    form.append('file', req.file.buffer, {
+      filename: req.file.originalname || 'audio.wav',
+      contentType: req.file.mimetype || 'audio/wav'
+    });
+
     const orpheusResponse = await fetch(`${ORPHEUS_BACKEND}/v1/sense`, {
       method: 'POST',
-      body: form
+      body: form,
+      headers: form.getHeaders()
     });
-    
+
+    if (!orpheusResponse.ok) {
+      const err = await orpheusResponse.text();
+      return res.status(orpheusResponse.status).json({ error: err });
+    }
+
     const biomarkers = await orpheusResponse.json();
     res.json(biomarkers);
+  } catch (err) {
+    console.error('Sense error:', err.message);
+    res.status(500).json({ error: err.message });
   }
-);
-
-// Freier Health-Check (kein x402)
-app.get('/health', (req, res) => {
-  res.json({ status: 'alive', biomarkers: 88, version: '1.0' });
 });
 
-// Pricing-Info (kein x402)
-app.get('/pricing', (req, res) => {
+// Stream endpoints — proxy with stream filter param
+async function proxyStream(req, res, stream) {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No audio file provided' });
+
+    const form = new FormData();
+    form.append('file', req.file.buffer, {
+      filename: req.file.originalname || 'audio.wav',
+      contentType: req.file.mimetype || 'audio/wav'
+    });
+
+    const orpheusResponse = await fetch(`${ORPHEUS_BACKEND}/v1/sense?stream=${stream}`, {
+      method: 'POST',
+      body: form,
+      headers: form.getHeaders()
+    });
+
+    if (!orpheusResponse.ok) {
+      const err = await orpheusResponse.text();
+      return res.status(orpheusResponse.status).json({ error: err });
+    }
+
+    const biomarkers = await orpheusResponse.json();
+    res.json(biomarkers);
+  } catch (err) {
+    console.error(`Stream ${stream} error:`, err.message);
+    res.status(500).json({ error: err.message });
+  }
+}
+
+app.post('/v1/sense/authority',    upload.single('audio'), (req, res) => proxyStream(req, res, 'authority'));
+app.post('/v1/sense/emotion',      upload.single('audio'), (req, res) => proxyStream(req, res, 'emotion'));
+app.post('/v1/sense/health',       upload.single('audio'), (req, res) => proxyStream(req, res, 'health'));
+app.post('/v1/sense/authenticity', upload.single('audio'), (req, res) => proxyStream(req, res, 'authenticity'));
+
+// ── Free Endpoints ────────────────────────────────────────────────────────────
+
+app.get('/health', (req, res) => {
   res.json({
-    full_spectrum: { price: '0.10', currency: 'USDC', biomarkers: 88 },
-    authority_stream: { price: '0.03', currency: 'USDC', biomarkers: 12 },
-    emotion_stream: { price: '0.03', currency: 'USDC', biomarkers: 15 },
-    health_stream: { price: '0.05', currency: 'USDC', biomarkers: 18 },
-    authenticity_stream: { price: '0.04', currency: 'USDC', biomarkers: 10 }
+    status: 'alive',
+    biomarkers: 88,
+    version: '1.1.0',
+    bazaar: true,
+    network: 'base',
+    wallet: WALLET
   });
 });
 
+app.get('/pricing', (req, res) => {
+  res.json({
+    currency: 'USDC',
+    network: 'base',
+    streams: {
+      full_spectrum:   { price: '0.10', biomarkers: 88, endpoint: 'POST /v1/sense' },
+      authority:       { price: '0.03', biomarkers: 12, endpoint: 'POST /v1/sense/authority' },
+      emotion:         { price: '0.03', biomarkers: 15, endpoint: 'POST /v1/sense/emotion' },
+      health:          { price: '0.05', biomarkers: 18, endpoint: 'POST /v1/sense/health' },
+      authenticity:    { price: '0.04', biomarkers: 10, endpoint: 'POST /v1/sense/authenticity' }
+    },
+    bazaar_discoverable: true,
+    quickstart: 'https://github.com/timvonsachs/orpheus-x402'
+  });
+});
+
+// Example output for Bazaar discovery browsers
+app.get('/example', (req, res) => {
+  res.json(BIOMARKER_OUTPUT_EXAMPLE);
+});
+
+// ── Start ─────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 8402;
 app.listen(PORT, () => {
-  console.log(`Orpheus x402 Service live on port ${PORT}`);
-  console.log('Wallet: ' + WALLET);
-  console.log('Price: $' + PRICE + ' USDC per analysis');
+  console.log(`Orpheus x402 v1.1.0 — port ${PORT}`);
+  console.log(`Wallet:      ${WALLET}`);
+  console.log(`Facilitator: ${FACILITATOR_URL}`);
+  console.log(`Bazaar:      enabled (5 streams discoverable)`);
+  console.log(`Streams:     Full $0.10 | Authority $0.03 | Emotion $0.03 | Health $0.05 | Authenticity $0.04`);
 });

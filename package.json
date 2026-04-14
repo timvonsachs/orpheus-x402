@@ -12,6 +12,7 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
+    "@x402/extensions": "^2.10.0",
     "express": "^5.2.1",
     "form-data": "^4.0.5",
     "multer": "^2.1.1",

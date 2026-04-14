@@ -95,106 +95,52 @@ const BIOMARKER_OUTPUT_EXAMPLE = {
 app.use(paymentMiddleware(
   WALLET,
   {
-    // Full Spectrum — 88 biomarkers
     'POST /v1/sense': {
       price: '$0.10',
       network: 'base',
       config: {
-        description: 'Orpheus Voice Intelligence API — 88 acoustic biomarkers from any audio file. Analyzes humanness, engagement, authority, stress, emotion, confidence, and environment. Built for sales call optimization, voice authentication, and mental health monitoring. $0.10 per analysis. No API key required.',
+        description: 'Orpheus Voice Intelligence — 88 acoustic biomarkers from any audio. Humanness, engagement, authority, stress, emotion, environment. $0.10/call. No API key.',
         mimeType: 'application/json',
         discoverable: true,
         outputSchema: BIOMARKER_OUTPUT_SCHEMA,
-        inputSchema: {
-          contentType: 'multipart/form-data',
-          properties: {
-            file: {
-              type: 'string',
-              format: 'binary',
-              description: 'Audio file (WAV, MP3, M4A, OGG, FLAC) — any sample rate, mono or stereo'
-            }
-          },
-          required: ['file']
-        }
       }
     },
-
-    // Authority Stream — 12 biomarkers
     'POST /v1/sense/authority': {
       price: '$0.03',
       network: 'base',
       config: {
-        description: 'Orpheus Authority Stream — 12 authority and confidence biomarkers: authority score, confidence level, assertiveness, dominance indicators. Optimized for leadership assessment and sales coaching.',
+        description: 'Orpheus Authority Stream — 12 biomarkers: authority score, confidence, assertiveness. $0.03/call.',
         mimeType: 'application/json',
         discoverable: true,
-        outputSchema: {
-          type: 'object',
-          properties: {
-            authority:    { type: 'number', description: 'Authority score 0-100' },
-            confidence:   { type: 'number', description: 'Confidence level 0-1' },
-            assertiveness:{ type: 'number', description: 'Assertiveness score 0-1' }
-          }
-        }
       }
     },
-
-    // Emotion Stream — 15 biomarkers
     'POST /v1/sense/emotion': {
       price: '$0.03',
       network: 'base',
       config: {
-        description: 'Orpheus Emotion Stream — 15 emotional biomarkers: valence, arousal, emotion prediction, stress level, engagement. Optimized for customer service quality and mental health monitoring.',
+        description: 'Orpheus Emotion Stream — 15 biomarkers: valence, arousal, emotion prediction, stress, engagement. $0.03/call.',
         mimeType: 'application/json',
         discoverable: true,
-        outputSchema: {
-          type: 'object',
-          properties: {
-            valence:    { type: 'string', description: 'positive|negative|neutral' },
-            arousal:    { type: 'number', description: 'Arousal level 0-1' },
-            emotion:    { type: 'string', description: 'Predicted emotion label' },
-            stress:     { type: 'number', description: 'Stress level 0-1' },
-            engagement: { type: 'number', description: 'Engagement level 0-1' }
-          }
-        }
       }
     },
-
-    // Health Stream — 18 biomarkers
     'POST /v1/sense/health': {
       price: '$0.05',
       network: 'base',
       config: {
-        description: 'Orpheus Health Stream — 18 voice health biomarkers: vocal fatigue, tremor indicators, breathiness, laryngeal tension. Optimized for wellness monitoring and clinical research.',
+        description: 'Orpheus Health Stream — 18 voice health biomarkers: vocal fatigue, tremor, breathiness. $0.05/call.',
         mimeType: 'application/json',
         discoverable: true,
-        outputSchema: {
-          type: 'object',
-          properties: {
-            vocal_fatigue: { type: 'number', description: 'Vocal fatigue score 0-1' },
-            breathiness:   { type: 'number', description: 'Breathiness level 0-1' },
-            tremor:        { type: 'number', description: 'Tremor index 0-1' }
-          }
-        }
       }
     },
-
-    // Authenticity Stream — 10 biomarkers
     'POST /v1/sense/authenticity': {
       price: '$0.04',
       network: 'base',
       config: {
-        description: 'Orpheus Authenticity Stream — 10 authenticity and humanness biomarkers: humanness score, deception indicators, spontaneity markers. Optimized for fraud detection and deepfake identification.',
+        description: 'Orpheus Authenticity Stream — 10 biomarkers: humanness score, deepfake detection, authenticity. $0.04/call.',
         mimeType: 'application/json',
         discoverable: true,
-        outputSchema: {
-          type: 'object',
-          properties: {
-            humanness_score:   { type: 'number', description: 'Humanness 0-100 (100=definitely human)' },
-            classification:    { type: 'string', description: 'human|ai|uncertain' },
-            authenticity_score:{ type: 'number', description: 'Authenticity 0-100' }
-          }
-        }
       }
-    }
+    },
   },
   facilitatorConfig
 ));

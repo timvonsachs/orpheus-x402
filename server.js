@@ -13,11 +13,13 @@ const WALLET          = process.env.WALLET_ADDRESS || '0x3A48748098B08d0BdD8dd79
 // ── Facilitator ───────────────────────────────────────────────────────────────
 // CDP facilitator (mainnet + free tier 1,000 tx/month)
 // Fallback: openx402.ai (no auth required)
-const FACILITATOR_URL = process.env.CDP_FACILITATOR_URL || 'https://api.cdp.coinbase.com/platform/v2/x402';
+const FACILITATOR_URL = (process.env.CDP_API_KEY_ID && process.env.CDP_API_KEY_SECRET)
+  ? (process.env.CDP_FACILITATOR_URL || 'https://api.cdp.coinbase.com/platform/v2/x402')
+  : 'https://x402.org/facilitator';
 
 const facilitatorConfig = { url: FACILITATOR_URL };
 
-// CDP API keys for mainnet (optional — falls back to openx402.ai without them)
+// CDP API keys for mainnet (optional)
 if (process.env.CDP_API_KEY_ID && process.env.CDP_API_KEY_SECRET) {
   facilitatorConfig.cdpApiKeyId     = process.env.CDP_API_KEY_ID;
   facilitatorConfig.cdpApiKeySecret = process.env.CDP_API_KEY_SECRET;

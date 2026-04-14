@@ -1,8 +1,8 @@
 const express = require('express');
 const { paymentMiddleware } = require('x402-express');
 const multer = require('multer');
-const fetch = require('node-fetch');
 const FormData = require('form-data');
+// Node 20 hat fetch built-in — kein node-fetch nötig
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
